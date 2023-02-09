@@ -1,0 +1,373 @@
+<html>
+<head>
+<title>MyWebApp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style type="text/css">
+    body {
+        margin: 0em;
+        margin-top: 0em;
+        margin-left: 0em;
+        margin-right: 0em;
+        margin-bottom: 0em;
+        font-family: sans-serif;
+        background-color: #555555;
+    }
+    div.main {
+        background-color: #f5f5f1;
+        padding-top: 3em;
+        padding-left: 3em; 
+        padding-right: 3em; 
+        padding-bottom: 3em;
+        max-width: 45em; 
+        margin: 0 auto;
+        min-height: 100%;
+    }
+    td {
+       width: 5em;
+    }
+</style>
+<script>
+
+function formatOutput(res) {
+     if (res.length == 0) {
+     	return "Empty data";
+     }
+
+     var ts = "<table><tr style='text-align:left;'>"
+              + "<th>name</th><th>age</th><th>gender</th><th>height</th><th>country</th><th>phonenum</th><tr>";
+     for (var ni = 0; ni < res.length; ni++) {
+         var row = "<tr><td>" + res[ni].name
+                 + "</td><td>" + res[ni].age 
+                 + "</td><td>" + res[ni].gender
+                 + "</td><td>" + res[ni].height
+                 + "</td><td>" + res[ni].country
+                 + "</td><td>" + res[ni].phonenum
+                 + "</td></tr>";
+         ts = ts + row;
+     }
+     ts = ts + "</table>";
+     return ts;
+}
+
+
+function getAllUsers() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/getAllUsers", true);
+    xhr.onreadystatechange = function() {
+    	if (xhr.readyState == 4) {
+            if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                var res = JSON.parse(xhr.responseText);
+                if(res.code == -1) {
+                   console.log("Failed to getAllUsers! reason: " + res.status);
+                } else {
+                   document.getElementById("response").innerHTML = formatOutput(res.data);    // JSON.stringify(res.data);
+                }
+            } else {
+                console.log("error: response not in json format: " + xhr.responseText);
+            }
+	}
+    }
+    xhr.send();    
+}
+
+function getSomeUser() {
+    var r_name = document.getElementById("name").value;
+    var person = {"name": r_name};
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/getSomeUser", true);
+    xhr.setRequestHeader('content-type', 'application/json');
+    xhr.onreadystatechange = function() {
+    	if (xhr.readyState == 4) {
+            if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                var res = JSON.parse(xhr.responseText);
+                if(res.code == -1) {
+                   console.log("Failed to getSomeUser! reason: " + res.status);
+                } else {
+                   document.getElementById("response").innerHTML = formatOutput(res.data); // JSON.stringify(res.data);
+                }
+            } else {
+                console.log("error: response not in json format: " + xhr.responseText);
+            }
+	}
+    }
+    xhr.send(JSON.stringify(person));    
+}
+
+function addUser() {
+    var r_name = document.getElementById("name").value;
+    var r_age = parseInt(document.getElementById("age").value);
+    var sel = document.getElementById("gender");
+    var r_gender = parseInt(sel.options[sel.selectedIndex].value);
+    var r_height = parseFloat(document.getElementById("height").value);
+    var r_country = document.getElementById("country").value;
+    var r_phone = parseInt(document.getElementById("phonenum").value);   
+ 
+    var person = {"name": r_name,
+                  "age": r_age,
+                  "gender": r_gender,
+                  "height": r_height,
+                  "country": r_country,
+                  "phonenum": r_phone
+                 } ;
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/addUser", true);
+    xhr.setRequestHeader('content-type', 'application/json');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState == 4) {
+            if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+	        var res = JSON.parse(xhr.responseText);
+	  	if(res.code == -1){
+                    console.log("failed to addUser! reason: " + res.status);
+	  	} else {
+                  document.getElementById("response").innerHTML = "OK to addUser";
+                }
+            } else {
+                console.log("error: response not in json format: " + xhr.responseText);
+	    }
+        }
+    }
+
+    xhr.send(JSON.stringify(person));
+}
+
+function deleteUser() {
+     var r_phone = parseInt(document.getElementById("phonenum").value);
+     var person = {"phonenum": r_phone};
+     
+     var xhr = new XMLHttpRequest();
+     xhr.open("POST", "/deleteUser", true);
+     xhr.setRequestHeader('content-type', 'application/json');
+     xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4) {
+              if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                  var res = JSON.parse(xhr.responseText);
+                  if(res.code == -1) {
+                     console.log("failed to deleteUser! reason: " + res.status);   
+                  } else {
+                     document.getElementById("response").innerHTML = "OK to deleteUser";
+                  } 
+              } else {
+                  console.log("error: response not in json format: " + xhr.responseText);
+              }
+         }
+     }
+     xhr.send(JSON.stringify(person));
+}
+
+function updateUser() {
+    var r_name = document.getElementById("name").value;
+    var r_age = parseInt(document.getElementById("age").value);
+    var sel = document.getElementById("gender");
+    var r_gender = parseInt(sel.options[sel.selectedIndex].value);
+    var r_height = parseFloat(document.getElementById("height").value);
+    var r_country = document.getElementById("country").value;
+    var r_phone = parseInt(document.getElementById("phonenum").value);   
+ 
+    var person = {"name": r_name,
+                  "age": r_age,
+                  "gender": r_gender,
+                  "height": r_height,
+                  "country": r_country,
+                  "phonenum": r_phone
+                 } ;
+
+     var xhr = new XMLHttpRequest();
+     xhr.open("POST", "/updateUser", true);
+     xhr.setRequestHeader('content-type', 'application/json');
+     xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4) {
+              if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                  var res = JSON.parse(xhr.responseText);
+                  if(res.code == -1) {
+                     console.log("failed to updateUser!");   
+                  } else {
+                     document.getElementById("response").innerHTML = "OK to updateUser";
+                  } 
+              } else {
+                  console.log("error: response not in json format: " + xhr.responseText);
+              }
+         }
+     }
+     xhr.send(JSON.stringify(person));
+}
+
+function upLoadFiles() {
+     var  items = document.querySelector("#file_items"),
+          progress = document.querySelector("#progress"),
+          info = document.querySelector("#info");
+
+     if (items.files.length === 0) {
+        console.log("no files selected!");
+        return;
+     }
+     
+    var formData = new FormData();
+    for (var fi = 0; fi < items.files.length; fi++){
+       formData.append("myfiles", items.files[fi]);
+    }
+ 
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            console.log(xhr.responseText);
+            info.innerHTML = xhr.responseText;
+        }
+    };
+ 
+    xhr.upload.addEventListener("progress", 
+        function(event) {
+            if(event.lengthComputable){
+               progress.style.width = Math.ceil(event.loaded * 100 / event.total) + "%";
+            }
+        }, false);
+ 
+    xhr.open("POST", "/upLoadFiles");
+    xhr.send(formData);
+}
+
+function formatFileList(fs) {
+     if (fs.length == 0) {
+     	return "Empty File List";
+     }
+
+     var ts = "<table><tr style='text-align:left;'>"
+              + "<th style='width:15em'>filename</th>";
+     for (var ni = 0; ni < fs.length; ni++) {
+         var row = "<tr><td style='width:15em'>" + fs[ni] + "</td></tr>";
+         ts = ts + row;
+     }
+     ts = ts + "</table>";
+     return ts;
+}
+
+function listFiles() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "/listFiles", true);
+    xhr.onreadystatechange = function() {
+    	if (xhr.readyState == 4) {
+            if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                var res = JSON.parse(xhr.responseText);
+                if(res.code == -1) {
+                   console.log("Failed to listFiles! reason: " + res.status);
+                } else {
+                   document.getElementById("response").innerHTML = formatFileList(res.data);
+                }
+            } else {
+                console.log("error: response not in json format: " + xhr.responseText);
+            }
+	}
+    }
+    xhr.send();    
+
+}
+
+function downloadFile() {
+    var r_file = document.getElementById("filename").value;
+    var fn = {"filename": r_file};
+    
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/downloadFile", true);
+    xhr.setRequestHeader('content-type', 'application/json');
+    xhr.responseType = 'blob';
+    xhr.onreadystatechange = function() {
+    	if(xhr.readyState == 4){
+           if (xhr.status != 200) {
+              var msg = xhr.getResponseHeader("errorMsg");
+              console.log("errorMsg = " + decodeURIComponent(msg.replace(/\+/g,'%20')));
+           } else {
+              let url = window.URL.createObjectURL(xhr.response);
+              let a = document.createElement('a');
+              a.href = url;
+              a.download = r_file;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              window.URL.revokeObjectURL(url);
+	   }
+        }
+    }
+    xhr.send(JSON.stringify(fn));    
+
+}
+
+function deleteFile() {
+     var r_file = document.getElementById("filename").value;
+     var fn = {"filename": r_file};
+     
+     var xhr = new XMLHttpRequest();
+     xhr.open("POST", "/deleteFile", true);
+     xhr.setRequestHeader('content-type', 'application/json');
+     xhr.onreadystatechange = function() {
+         if (xhr.readyState == 4) {
+              if(xhr.getResponseHeader('content-type').indexOf("application/json") >= 0) {
+                  var res = JSON.parse(xhr.responseText);
+                  if(res.code == -1) {
+                     console.log("failed to deleteFile! reason: " + res.status);   
+                  } else {
+                     document.getElementById("response").innerHTML = "OK to deleteFile";
+                  } 
+              } else {
+                  console.log("error: response not in json format: " + xhr.responseText);
+              }
+         }
+     }
+     xhr.send(JSON.stringify(fn));
+}
+
+</script>
+</head>
+<body>
+<div class="main">
+	<h2>Hello World from MyWebApp!</h2>
+	<div>
+           <table>
+                 <tr><td>name:</td><td><input type="text" id="name"></td></tr>
+                 <tr><td>age:</td><td><input type="text" id="age" ></td></tr>
+                 <tr><td>gender:</td>
+                     <td><select id="gender" style="width:100%">
+                         <option value="1">male</option>
+                         <option value="2">female</option>
+                     </select></td>
+                 </tr>
+                 <tr><td>height:</td><td><input type="text" id="height"></td></tr>
+                 <tr><td>country:</td><td><input type="text" id="country"></td></tr>
+                 <tr><td>phonenum:</td><td><input type="text" id="phonenum"></td></tr>
+           </table>
+           <br>
+           <div>
+               <button type="button" onclick="getAllUsers()">getAllUsers</button>
+               <button type="button" onclick="getSomeUser()">getSomeUser</button>
+               <button type="button" onclick="addUser()">addUser</button>
+               <button type="button" onclick="deleteUser()">deleteUser</button>
+               <button type="button" onclick="updateUser()">updateUser</button>
+           </div>
+	   <br><hr>
+           <b>response:</b>
+           <div id="response"></div>
+       </div>
+       <hr>
+       <div>
+          <p>
+             <input type="file" id="file_items" multiple="multiple"/>
+             <button type="button" id="btn_upload" onclick="upLoadFiles()">upLoad</button>
+          </p>
+          <div id="progress_bar" style="border:1px solid #000;">
+              <div id="progress" style="background:#DEDEDE; height:20px;width:0;"></div>
+          </div>
+          <p id="info"></p>
+       </div>
+       <div>
+           <button id="btn_listFiles" onclick="listFiles()">listFiles</button>
+           <div><p id="list_files"/></div>
+       </div><hr>
+       <div>
+           filename:<input type="text" id="filename">
+           <button id="btn_downloadFile" onclick="downloadFile()">downloadFile</button>
+           <button id="btn_deleteFile" onclick="deleteFile()">deleteFile</button>
+           <p id="op_res"/>
+       </div>
+</div>
+</body>
+</html>
