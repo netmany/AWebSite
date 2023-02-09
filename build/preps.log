@@ -5,7 +5,7 @@ keytool -genkeypair -alias myweb -keypass myweb123 -keyalg RSA -validity 3650 -k
 2. mysql db init
 mysql -u root -p 123 < init.sql
 
-3. maven build
+3. maven project build and run/test it
 mvn clean package
 nohup java -jar ./target/AWebSite.jar > temp.txt &
 
